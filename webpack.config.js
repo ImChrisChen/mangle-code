@@ -386,16 +386,16 @@ module.exports = {
                         unsafe_Function: true,          //当args和code均为字符串文字时，进行压缩和修饰
                         unsafe_comps: true,             //压缩表达式，例如a <= b假设任何操作数都不能（强制）NaN。
                     },
-                    mangle: {
-                        // mangle options
-                        toplevel: true,
-
-                        properties: {
-                            builtins: false,
-                            keep_quoted: false,
-                            reserved: reservedArr,
-                        }
-                    },
+                    // mangle: {
+                    //     // mangle options
+                    //     toplevel: true,
+                    //
+                    //     properties: {
+                    //         builtins: false,
+                    //         keep_quoted: false,
+                    //         // reserved: reservedArr,
+                    //     }
+                    // },
                     output: {
                         // output options
                         ascii_only: true,

@@ -1,67 +1,27 @@
 var md5 = require("./md5")
-wx.onTouchStart(function(e){
-    _mn.mnInit(
-        {
-        game_id:'200000812',
-          game_key:'b4d6f4ac9046dc2095fa01d62077e222',
-          game_name:'四海牧云',
-            game_ver:'2.0',
-          offer_id:'1450017456',
-        }
-    );
-    _mn.mnLogin(function(){
-        console.log('1111')
-    });
-    // wx.showModal({
-    //     title: '订单支付',
-    //     content: '我告诉你如何支付',
-    //     showCancel:false,
-    //     confirmText:'进入客服',
-    //     success (res) {
-    //       if (res.confirm) {
-    //         console.log('用户点击确定')
-    //         wx.openCustomerServiceConversation({
-    //             showMessageCard: true,
-    //             success:function(e){
-    //                 console.log(e)
-    //             },
-    //             fail:function(e){
-    //                 console.log(e)
-    //             }
-    //         })
-    //       } else if (res.cancel) {
-    //         console.log('用户点击取消')
-    //       }
-    //     }
-    // })
-})
 
 var _mn = {}
 // var order_testStr = "agent="+JSON.stringify(pay_json.agent)+"&"+"channel_platform="+JSON.stringify(pay_json.channel_platform)+"&"+"device="+JSON.stringify(pay_json.device)+"&"+"game="+JSON.stringify(pay_json.game)+"&"+"other="+JSON.stringify(pay_json.other)+"&"+"role="+JSON.stringify(pay_json.role)+"&"+"verify="+JSON.stringify(pay_json.verify)
+ 
 
 
-
-// var domain = "https://authorizetest.aidalan.com/v1/";
-// var paymain = "http://paytest.aidalan.com/v1/";
 var domain = "https://authorize.aidalan.com/v1/";
 var paymain = "https://payments.aidalan.com/v1/";
 
 var dalan_api = {
-  login_api : "miniGame/otherOpenAuthorize",
-  pay_api : "miniGame/order",
-  getBalance_api : "miniGame/getMiniBalance",
+    login_api : "miniGame/otherOpenAuthorize",
+    pay_api : "miniGame/order",
+    getBalance_api : "miniGame/getMiniBalance",
 }
 
 var systemInfo =wx.getSystemInfoSync();
 var android = systemInfo.system.toLowerCase().indexOf('ios') < 0;
 
+
+
 _mn.getPubData = function () {
   var time = new Date();
   // 获取时区
-//   var timeZone = (v) => {
-//     var newV = Math.abs(v) < 10 ? `0${Math.abs(v)}:00` : `${Math.abs(v)}:00`;
-//     return v < 0 ? `+ ${newV}` : `- ${newV}`;
-//   };
   var timeZone = function(v) {
     var newV = Math.abs(v) < 10 ? `0${Math.abs(v)}:00` : `${Math.abs(v)}:00`;
     return v < 0 ? `+ ${newV}` : `- ${newV}`;
@@ -72,11 +32,11 @@ _mn.getPubData = function () {
   var game_name = game_config.game_name
   var game_key = game_config.game_key
   var game_ver = game_config.game_ver
-  var getDevInfo = function () {
+  var getDevInfo = function () {   
     var deviceInfo = {};
     var net_type = "";
     var screen_brightness = "";
-    var osInfo
+    var osInfo 
     // 获取设备信息
     // 系统信息
     deviceInfo = wx.getSystemInfoSync()
@@ -102,18 +62,18 @@ _mn.getPubData = function () {
     screen_brightness = (wx.getStorageSync('screen_brightness')+0)*100
 
     var device = {
-      "screen_width": ""+deviceInfo.screenWidth,
-      "screen_height": ""+deviceInfo.screenHeight,
-      "device_name":  deviceInfo.brand+" "+deviceInfo.model,
-      "os_ver": ""+osInfo[1],
-      "sdk_ver": "1.0.0",
-      "package_name": "com.junhai.union_new",
-      "os_type": ""+osInfo[0],
-      "net_type": ""+net_type,
-      "brand": ""+deviceInfo.brand,
-      "model": ""+deviceInfo.model,
-      "battery_level": ""+deviceInfo.batteryLevel,
-      "screen_brightness": ""+screen_brightness,
+        "screen_width": ""+deviceInfo.screenWidth,
+        "screen_height": ""+deviceInfo.screenHeight,
+        "device_name":  deviceInfo.brand+" "+deviceInfo.model,
+        "os_ver": ""+osInfo[1],
+        "sdk_ver": "1.0.0",
+        "package_name": "com.junhai.union_new",
+        "os_type": ""+osInfo[0],
+        "net_type": ""+net_type,
+        "brand": ""+deviceInfo.brand,
+        "model": ""+deviceInfo.model,
+        "battery_level": ""+deviceInfo.batteryLevel,
+        "screen_brightness": ""+screen_brightness,
     }
 
     return device
@@ -145,9 +105,10 @@ _mn.getPubData = function () {
   return public_data
 }
 
+
 // 生成sign拼接字符串
 _mn.createSign = function (data) {
-  var sort_arr = []
+  var sort_arr = [] 
   for (var item in data) {
     sort_arr.push(item)
   }
@@ -161,11 +122,17 @@ _mn.createSign = function (data) {
   return signStr
 }
 
+
+
+
 // 初始化
 _mn.mnInit = function(game_config){
   wx.setStorageSync("game_config",game_config)
-
+  
 }
+
+
+
 
 // 一次登录
 _mn.mnLogin = function (callback) {
@@ -174,9 +141,7 @@ _mn.mnLogin = function (callback) {
 
   wx.login({
     success: function(res) {
-        console.log('res',res,);
       var public_data = _mn.getPubData()
-        console.log('openid',res.code, public_data.verify);
       public_data.verify.open_id = res.code
 
       var game_config = wx.getStorageSync("game_config")
@@ -185,9 +150,6 @@ _mn.mnLogin = function (callback) {
       var signStr = _mn.createSign(public_data) + key
       var sign = md5.md5(signStr)
       public_data['sign'] = sign
-      console.log('登录')
-      console.log(JSON.stringify(public_data))
-      console.log(post_url)
       wx.request({
         url: post_url, //仅为示例，并非真实的接口地址
         data:public_data,
@@ -196,8 +158,7 @@ _mn.mnLogin = function (callback) {
           'content-type': 'application/json' // 默认值
         },
         success: function(res) {
-            console.log('发起了请求')
-          var ret = res.data.ret
+          var ret = res.data.ret  
           if (ret == 1) {
             console.log("登录成功")
             var first_login_info = {
@@ -205,71 +166,10 @@ _mn.mnLogin = function (callback) {
               data:res.data.content ,
               msg:"登录成功"
             }
-
-            var options = res.data.content;
-            var login_data = {
-                authorize_code:Number(options.authorize_code),
-                union_app_id: 200000812,
-                time:Math.round(new Date() / 1000),
-                scope:1,
-            }
-            var signStr = _mn.createSign(login_data) + "ab51388b31d103fcee441f3e601ca624"
-            console.log(signStr)
-            var tokensign = md5.md5(signStr)
-            login_data['sign'] = tokensign
-
-            wx.request({
-                url: domain +'token', //仅为示例，并非真实的接口地址
-                data:login_data,
-                method:'POST',
-                header: {
-                'content-type': 'application/json' // 默认值
-                },
-                success:function(res){
-                    console.log(res)
-                    var ret = res.data.ret;
-                    if(ret === 1) {
-                        var options = res.data.content;
-                        _mn.onLoginRsp({
-                            access_token:options.access_token,
-                            union_user_id:options.union_user_id
-                        })
-
-                        var buy_options = {
-                            total_charge:'100',
-                            currency_code:'RMB',
-                            async_callback_url:'http://www.baidu.com',
-                            server_id:'78945',
-                            out_trade_no:'2020010415698745236',
-                            product_amount:'1',
-                            product_desc:'1',
-                            product_id:'1',
-                            product_name:'1',
-                            rate:'1',
-                            role_id:'1',
-                            role_name:'1',
-                            role_level:'1',
-                            role_online_time:'1',
-                            role_server:'1',
-                            role_type:'1',
-                            role_gender:'1',
-                            association_id:'1',
-                            association_name:'1',
-                            association_rank:'1'
-                        }
-                        _mn.mnBuy(buy_options,function(){
-                            console.log(1)
-                        },function(){
-                            console.log(2)
-                        });
-                    }
-                }
-            })
             wx.setStorageSync("open_id",res.data.content.open_id)
             callback(first_login_info)
           } else {
-            console.log("登录失败",JSON.stringify(res))
-            console.log(post_url)
+            console.log("登录失败",res.data)
             var errInfo = {
               ret : 0,
               data : res.data,
@@ -277,14 +177,10 @@ _mn.mnLogin = function (callback) {
               msg : "登录失败"
             }
             callback(errInfo)
-          }
+          } 
         }
       })
-
-    },
-    fail: function(res) {
-        console.log('进入了这里')
-        console.log(res)
+      
     }
   })
 }
@@ -296,6 +192,7 @@ _mn.onLoginRsp = function (obj) {
   login_rsp.union_user_id = obj.union_user_id
   wx.setStorageSync("login_rsp",login_rsp)
 }
+
 
 // 查询余额
 _mn.getBalance = function (obj,callback,change_type) {
@@ -315,7 +212,7 @@ _mn.getBalance = function (obj,callback,change_type) {
   var sign = md5.md5(balance_testStr)
   balance_json['sign'] = sign
   wx.request({
-    url:post_url ,
+    url:post_url , 
     data:balance_json,
     method:'POST',
     header: {
@@ -323,7 +220,7 @@ _mn.getBalance = function (obj,callback,change_type) {
     },
     success: function(res) {
       console.log(res)
-
+      
       if (res.data.content.balance === 0) {
         console.log("余额为0，可以下单",res.data)
         _mn.sendOrder(obj,callback,change_type)
@@ -344,12 +241,13 @@ _mn.getBalance = function (obj,callback,change_type) {
 // 发送下单请求
 _mn.sendOrder  = function (obj,callback,change_type) {
   var login_rsp = wx.getStorageSync("login_rsp")
-
+  
   var game_config = wx.getStorageSync("game_config")
   var key = game_config.game_key
 
   var post_url = domain + dalan_api.pay_api
   var pay_json = _mn.getPubData()
+
     var pay_type = '';
     if(android){
         pay_type = '37';
@@ -359,20 +257,20 @@ _mn.sendOrder  = function (obj,callback,change_type) {
   // 游戏角色参数
   var pay_role = {
     "role_level":obj.role_level,
-    "role_online_time":obj.role_online_time,
-    "role_name":obj.role_name,
-    "role_server":obj.role_server,
-    "role_id":obj.role_id,
-    "role_type":obj.role_type,
-    "role_gender":obj.role_gender,
-    "association_id":obj.association_id,
-    "association_name":obj.association_name,
-    "association_rank":obj.association_rank
+		"role_online_time":obj.role_online_time,
+		"role_name":obj.role_name,
+		"role_server":obj.role_server,
+		"role_id":obj.role_id,
+		"role_type":obj.role_type,
+		"role_gender":obj.role_gender,
+		"association_id":obj.association_id,
+		"association_name":obj.association_name,
+		"association_rank":obj.association_rank
   }
 
   // 订单参数
   var pay_verify = {
-    "access_token":	login_rsp.access_token,
+    "access_token":	login_rsp.access_token,		
 		"total_charge":obj.total_charge,
 		"currency_code":"RMB",
 		"async_callback_url":obj.async_callback_url,
@@ -404,10 +302,10 @@ _mn.sendOrder  = function (obj,callback,change_type) {
     },
     success: function(res) {
       if (res.data.msg == "success") {
-        console.log("下单请求成功:",res.data)
+        console.log("下单请求成功:",res.data) 
         var payment  = parseInt(pay_verify.total_charge)*parseInt(pay_verify.rate)/100
         console.log("下单金额（分）:",payment)
-        console.log(change_type)
+        // _mn.payCallback(res.data,callback)
         if(change_type){
             _mn.changeMiniPay(res.data.content.order_sn)
         }else {
@@ -422,24 +320,54 @@ _mn.sendOrder  = function (obj,callback,change_type) {
           msg : "下单请求失败"
         }
         callback(errInfo)
-      }
+      } 
     }
   })
 
 }
 
+// 下单
+_mn.mnBuy = function (obj,logoutCallback,callback) { 
+  wx.checkSession({
+    success:function (res) {
+      if (res.errMsg == "checkSession:ok") {
+        console.log("登录有效",res)
+        _mn.isChangePay(obj,callback);
+      } else {
+        console.log("登录过期。请重新登录",res)
+        var errInfo = {
+          ret : 0,
+          data : res.data,
+          msg : "登录过期。请重新登录"
+        }
+        callback(errInfo)
+        logoutCallback();
+      }
+    },
+    fail: function() {
+      console.log("登录过期。请重新登录",res)
+      var errInfo = {
+        ret : 0,
+        data : res.data,
+        msg : "登录过期。请重新登录"
+      }
+      callback(errInfo)
+      logoutCallback();
+    }
+  })
+  
+      
+}
+
 //判断是否切支付
 _mn.isChangePay = function(obj,callback){
-    // _mn.sendOrder(obj,callback,true)
     var public_data = _mn.getPubData();
     var device = public_data.device;
     var game = public_data.game;
     var channel_platform = public_data.channel_platform;
     var login_rsp = wx.getStorageSync("login_rsp");
-    var game_config = wx.getStorageSync("game_config")
-    var game_id = game_config.game_id
-    console.log(JSON.stringify(obj))
-    console.log(JSON.stringify(public_data))
+    var game_config = wx.getStorageSync("game_config");
+    var game_id = game_config.game_id;
     var change_data = {
         "extra_data": {
             "screen_brightness": device.screen_brightness,
@@ -487,8 +415,7 @@ _mn.isChangePay = function(obj,callback){
             "user_online_time": obj.role_online_time
         },
         "time": Math.round(new Date().getTime() / 1000),
-        // "union_app_id": game_id,
-        "union_app_id": "200000812",
+        "union_app_id": game_id,
         "union_channel": channel_platform.ad_id
     }
     wx.request({
@@ -532,39 +459,6 @@ _mn.judgePay = function(obj,callback,change_type){
     }
 }
 
-// 下单
-_mn.mnBuy = function (obj,logoutCallback,callback) {
-  wx.checkSession({
-    success:function (res) {
-      if (res.errMsg == "checkSession:ok") {
-        console.log("登录有效",res)
-        _mn.isChangePay(obj,callback);
-      } else {
-        console.log("登录过期。请重新登录",res)
-        var errInfo = {
-          ret : 0,
-          data : res.data,
-          msg : "登录过期。请重新登录"
-        }
-        callback(errInfo)
-        logoutCallback();
-      }
-    },
-    fail: function() {
-      console.log("登录过期。请重新登录",res)
-      var errInfo = {
-        ret : 0,
-        data : res.data,
-        msg : "登录过期。请重新登录"
-      }
-      callback(errInfo)
-      logoutCallback();
-    }
-  })
-
-
-}
-
 // 调起切支付付款
 _mn.changeMiniPay = function(order_sn){
     console.log('切支付进入客服')
@@ -578,7 +472,7 @@ _mn.changeMiniPay = function(order_sn){
                 console.log('用户点击确定')
                 wx.openCustomerServiceConversation({
                     showMessageCard: true,
-                    sessionFrom: order_sn,
+                    sessionFrom:order_sn,
                     sendMessageTitle:order_sn,
                     success:function(e){
                         console.log(e)
@@ -596,15 +490,14 @@ _mn.changeMiniPay = function(order_sn){
 
 // 调起android付款
 _mn.androidMiniPay = function (payment,obj,callback) {
-    console.log(payment)
-  var game_config = wx.getStorageSync('game_config')
-  var offerId = game_config.offer_id
+  var game_config = wx.getStorageSync('game_config') 
+  var offerId = game_config.offer_id 
   var midas_config = {
     mode: "game",
-    env: 0,
+    env: 1,
     offerId: offerId,
     currencyType: "CNY",
-    buyQuantity: 100,
+    buyQuantity: payment,
     platform: "android",
     zoneId: 1,
     success: function(e) {
@@ -622,11 +515,12 @@ _mn.androidMiniPay = function (payment,obj,callback) {
     }
   }
   wx.requestMidasPayment(midas_config)
-}
+} 
 
 
 // 支付回调
 _mn.payCallback = function (obj,callback) {
+
   // 获取游戏参数
   var game_config = wx.getStorageSync("game_config")
   var game_id = game_config.game_id
@@ -652,23 +546,20 @@ _mn.payCallback = function (obj,callback) {
   }
   var payCallback_testStr = _mn.createSign(payCallback_json) + key
   // 去掉双引号
-  payCallback_testStr = payCallback_testStr.replace(/\"/g,"")
+  payCallback_testStr = payCallback_testStr.replace(/\"/g,"") 
   // console.log(payCallback_testStr)
   var sign = md5.md5(payCallback_testStr)
   payCallback_json['sign'] = sign
   payCallback_json['extra_info'] = extra_info
-  console.log(JSON.stringify(payCallback_json))
   wx.request({
-    // url:post_url ,
-    url:'http://paytest.aidalan.com/v1/payCallBack/37',
+    url:post_url ,
     data:payCallback_json,
     method:'POST',
     header: {
       'content-type': 'application/json' // 默认值
     },
     success: function(res) {
-      console.log("payCallback:",JSON.stringify(res.data))
-      console.log(order_sn)
+      console.log("payCallback:",res.data)
       if (res.data.ret == 1) {
         var info = {
           ret : 1,
@@ -688,6 +579,7 @@ _mn.payCallback = function (obj,callback) {
     }
   })
 }
+
 //监控点击
 _mn.listenClick = function(time){
     wx.onTouchEnd(function(res){
@@ -730,5 +622,6 @@ _mn.listenClick = function(time){
         }
     })
 }
-_mn.listenClick('2020-01-08')
+
 module.exports =  _mn;
+
